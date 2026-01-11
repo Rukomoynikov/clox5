@@ -3,4 +3,9 @@ project(clox5 C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(clox5 main.c)
+add_executable(clox5 main.c
+        common.h
+        chunk.h
+        chunk.c
+        memory.h
+        memory.c)
