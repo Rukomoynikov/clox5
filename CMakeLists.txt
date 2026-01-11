@@ -8,4 +8,6 @@ add_executable(clox5 main.c
         chunk.h
         chunk.c
         memory.h
-        memory.c)
+        memory.c
+        debug.h
+        debug.c)
