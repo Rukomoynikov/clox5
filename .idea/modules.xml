@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/clox5.iml" filepath="$PROJECT_DIR$/.idea/clox5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/clox6.iml" filepath="$PROJECT_DIR$/.idea/clox6.iml" />
     </modules>
   </component>
 </project>
