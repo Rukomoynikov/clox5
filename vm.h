@@ -19,7 +19,7 @@ typedef enum {
 } InterpretResult;
 
 void initVM();
-InterpretResult interpret(Chunk * chunk);
+InterpretResult interpret(char * source);
 void freeVM();
 void push(Value value);
 Value pop();

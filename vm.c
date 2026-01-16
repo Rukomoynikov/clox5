@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "compiler.h"
 
 VM vm;
 
@@ -13,11 +14,9 @@ void initVM() {
   resetStack();
 }
 
-InterpretResult interpret(Chunk * chunk) {
-  vm.chunk = chunk;
-  vm.ip = vm.chunk -> code;
-
-  return run();
+InterpretResult interpret(char * source) {
+  compile(source);
+  return INTERPRET_OK;
 }
 
 static InterpretResult run() {
