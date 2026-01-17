@@ -8,9 +8,13 @@ static void advance();
 static void errorAtCurrent(const char * message);
 static void errorAt(Token * token, const char * message);
 static void consume(TokenType type, const char * errorMessage);
+static Chunk * currentChunk();
+static void endCompiler();
+static void emitReturn();
 
 bool compile(char * source, Chunk * chunk) {
   initScanner(source);
+  compilingChunk = chunk;
 
   parser.panicMode = false;
   parser.hadError = false;
@@ -18,6 +22,7 @@ bool compile(char * source, Chunk * chunk) {
   advance();
   expression();
   consume(TOKEN_EOF, "Expected end of expression");
+  endCompiler();
   return !parser.hadError;
 }
 
@@ -64,4 +69,25 @@ static void consume(TokenType type, const char * errorMessage) {
   }
 
   errorAtCurrent(errorMessage);
+}
+
+static void emitByte(uint8_t byte) {
+  writeChunk(currentChunk(), byte, parser.previous.line);
+}
+
+static Chunk * currentChunk() {
+  return compilingChunk;
+}
+
+static void endCompiler() {
+  emitReturn();
+}
+
+static void emitReturn() {
+  emitByte(OP_RETURN);
+}
+
+static void emitBytes(uint8_t byte1, uint8_t byte2) {
+  emitByte(byte1);
+  emitByte(byte2);
 }
