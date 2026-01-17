@@ -1,22 +1,67 @@
 #include "scanner.h"
+#include "chunk.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "compiler.h"
 
-void compile(char * source) {
+static void advance();
+static void errorAtCurrent(const char * message);
+static void errorAt(Token * token, const char * message);
+static void consume(TokenType type, const char * errorMessage);
+
+bool compile(char * source, Chunk * chunk) {
   initScanner(source);
 
-  int line = -1;
+  parser.panicMode = false;
+  parser.hadError = false;
+
+  advance();
+  expression();
+  consume(TOKEN_EOF, "Expected end of expression");
+  return !parser.hadError;
+}
+
+static void advance() {
+  parser.previous = parser.current;
 
   for (;;) {
-    Token token = scanToken();
-    if (token.line != line) {
-      printf("%4d ", token.line);
-      line = token.line;
-    } else {
-      printf("   | ");
-    }
+    parser.current = scanToken();
+    if (parser.current.type != TOKEN_ERROR) break;
 
-    printf("%2d '%.*s'\n", token.type, token.length, token.start);
-
-    if (token.type == TOKEN_EOF) break;
+    errorAtCurrent(parser.current.start);;
   }
+}
+
+static void errorAtCurrent(const char * message) {
+  errorAt(&parser.current, message);
+}
+
+static void error(const char * message) {
+  errorAt(&parser.previous, message);
+}
+
+static void errorAt(Token * token, const char * message) {
+  if (parser.panicMode) return;
+  parser.panicMode = true;
+  fprintf(stderr, "[ line %d] Error", token -> line);
+
+  if (token -> type == TOKEN_EOF) {
+    fprintf(stderr, "at the end.");
+  } else if (token -> type == TOKEN_ERROR) {
+
+  } else {
+    fprintf(stderr, "at '%.*s'", token -> length, token -> start);
+  }
+
+  fprintf(stderr, ": %s\n", message);
+  parser.hadError = true;
+}
+
+static void consume(TokenType type, const char * errorMessage) {
+  if (parser.current.type == type) {
+    advance();
+    return;
+  }
+
+  errorAtCurrent(errorMessage);
 }
