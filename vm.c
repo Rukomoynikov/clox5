@@ -24,6 +24,8 @@ InterpretResult interpret(char * source) {
     return INTERPRET_COMPILE_ERROR;
   }
 
+  disassembleChunk(&chunk, "Test chunk");
+
   vm.chunk = &chunk;
   vm.ip = vm.chunk -> code;
 
