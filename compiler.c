@@ -16,8 +16,8 @@ static void endCompiler();
 static void emitReturn();
 static void expression();
 static void number();
-static void emitConstant(double value);
-static uint8_t makeConstant(double value);
+static void emitConstant(Value value);
+static uint8_t makeConstant(Value value);
 static void grouping();
 static void parsePrecedence(Precedence precedence);
 static void binary();
@@ -178,14 +178,14 @@ static void emitBytes(uint8_t byte1, uint8_t byte2) {
 
 static void number() {
   double value = strtod(parser.previous.start, NULL);
-  emitConstant(value);
+  emitConstant(NUMBER_VAL(value));
 }
 
-static void emitConstant(double value) {
+static void emitConstant(Value value) {
   emitBytes(OP_CONSTANT, makeConstant(value));
 }
 
-static uint8_t makeConstant(double value) {
+static uint8_t makeConstant(Value value) {
   uint8_t constantIndex = addConstant(currentChunk(), value);
 
   if (constantIndex > UINT8_MAX) {
