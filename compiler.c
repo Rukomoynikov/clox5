@@ -204,13 +204,11 @@ static void grouping() {
 static void unary() {
   TokenType operatorType = parser.previous.type;
 
-  expression();
-
   parsePrecedence(PREC_UNARY);
 
   switch (operatorType) {
     case TOKEN_MINUS: emitByte(OP_NEGATE); break;
-    default: return;
+    default: return; // Unreachable.
   }
 }
 
