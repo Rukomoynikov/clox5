@@ -14,6 +14,7 @@ static void resetStack();
 static InterpretResult run();
 static Value peek(int distance);
 static void runtimeError(const char * format, ...);
+static bool isFalsey(Value value);
 
 void initVM() {
   resetStack();
@@ -88,6 +89,18 @@ static InterpretResult run() {
         // printValue(constant);
         // printf("\n");
         break;
+      case OP_FALSE: push(BOOL_VAL(false)); break;
+      case OP_TRUE: push(BOOL_VAL(true)); break;
+      case OP_NIL: push(NIL_VAL); break;
+      case OP_NOT: push(BOOL_VAL(isFalsey(pop()))); break;
+      case OP_EQUAL: {
+        Value a = pop();
+        Value b = pop();
+        push(BOOL_VAL(valuesEqual(a, b)));
+        break;
+      }
+      case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
+      case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
     }
   }
   #undef BINARY_OP
@@ -128,4 +141,8 @@ static void runtimeError(const char * format, ...) {
   int line = vm.chunk -> lines[instruction];
   fprintf(stderr, "[line %d] in script\n", line);
   resetStack();
+}
+
+static bool isFalsey(Value value) {
+  return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
