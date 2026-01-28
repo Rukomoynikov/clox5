@@ -18,4 +18,6 @@ add_executable(clox5 main.c
         compiler.h
         compiler.c
         scanner.h
-        scanner.c)
+        scanner.c
+        object.h
+        object.c)
