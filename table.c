@@ -77,3 +77,13 @@ void tableAddAll(Table * from, Table * to) {
     if (entry -> key != nullptr) tableSet(to, entry -> key, entry -> value);
   }
 }
+
+bool tableGet(Table * table, ObjString * key, Value * value) {
+  if (table -> count == 0) return false;
+
+  Entry * entry = findEntry(table -> entries, table -> capacity, key);
+  if (entry -> key == nullptr) return false;
+
+  *value = entry -> value;
+  return true;
+}
