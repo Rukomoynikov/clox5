@@ -22,6 +22,7 @@ static void concatenate();
 
 void initVM() {
   resetStack();
+  // initTable(&vm.strings);
 }
 
 InterpretResult interpret(char * source) {
@@ -124,7 +125,7 @@ static InterpretResult run() {
 }
 
 void freeVM() {
-
+  // freeTable(&vm.strings);
 }
 
 static void resetStack() {
