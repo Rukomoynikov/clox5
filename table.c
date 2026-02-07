@@ -29,7 +29,7 @@ bool tableSet(Table * table, ObjString * key, Value value) {
   Entry * entry = findEntry(table -> entries, table -> capacity, key);
   bool isNewKey = entry -> key == nullptr;
 
-  if (isNewKey) table -> count++;
+  if (isNewKey && IS_NIL(entry -> value)) table -> count++;
 
   entry -> key = key;
   entry -> value = value;
@@ -39,9 +39,20 @@ bool tableSet(Table * table, ObjString * key, Value value) {
 
 static Entry * findEntry(Entry * entries, int capacity, ObjString * key) {
   uint32_t index = key -> hash % capacity;
+  Entry * tombstone = nullptr;
+
   for (;;) {
     Entry * entry = &entries[index];
-    if (entry -> key == key || entry -> key == nullptr) return entry;
+
+    if (entry -> key == nullptr) {
+      if (IS_NIL(entry -> value)) {
+        return tombstone != nullptr ? tombstone : entry;
+      } else {
+        if (tombstone == nullptr) tombstone = entry;
+      }
+    } else if (entry -> key == key) {
+      return entry;
+    }
 
     index = (index + 1) % capacity;
   }
@@ -49,6 +60,8 @@ static Entry * findEntry(Entry * entries, int capacity, ObjString * key) {
 
 static void adjustCapacity(Table * table, int capacity) {
   Entry * entries = ALLOCATE(Entry, capacity);
+
+  table -> count = 0;
 
   for (int i = 0; i < table -> capacity; i++) {
     entries[i].key = nullptr;
@@ -85,5 +98,17 @@ bool tableGet(Table * table, ObjString * key, Value * value) {
   if (entry -> key == nullptr) return false;
 
   *value = entry -> value;
+  return true;
+}
+
+bool tableDelete(Table * table, ObjString * key) {
+  if (table -> count == 0) return false;
+
+  Entry * entry = findEntry(table -> entries, table -> capacity, key);
+  if (entry -> key == nullptr) return false;
+
+  entry -> key = nullptr;
+  entry -> value = BOOL_VAL(true);
+
   return true;
 }
